@@ -5,10 +5,10 @@ use std::io::BufRead;
 
 fn main() {
     let file = File::open("input.txt").unwrap();
-    let content = std::io::BufReader::new(file)
+    let content: Vec<String> = std::io::BufReader::new(file)
         .lines()
         .map(|line| line.unwrap())
-        .collect::<Vec<String>>();
+        .collect();
     let mut games: Vec<Game> = vec![];
     for line in content {
         games.push(parse_input(&line));
@@ -18,7 +18,7 @@ fn main() {
     two(&games);
 }
 
-fn one(games: &Vec<Game>) {
+fn one(games: &[Game]) {
     let num_of_balls: HashMap<&str, u8> = [("red", 12), ("green", 13), ("blue", 14)]
         .iter()
         .cloned()
@@ -46,7 +46,7 @@ fn parse_input(s: &str) -> Game {
         draws: vec![],
     };
     let split: Vec<&str> = s[5..].split(&[':', ';']).map(|x| x.trim()).collect();
-    game.id = split[0].parse::<u8>().unwrap();
+    game.id = split[0].parse().unwrap();
 
     for str_draw in &split[1..] {
         let key_value_pairs: Vec<&str> = str_draw.split(',').collect();
@@ -71,7 +71,7 @@ fn parse_input(s: &str) -> Game {
     return game;
 }
 
-fn two(games: &Vec<Game>) {
+fn two(games: &[Game]) {
     let mut total: u32 = 0;
 
     for game in games {

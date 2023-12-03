@@ -3,16 +3,16 @@ use std::fs::File;
 use std::io::BufRead;
 fn main() {
     let f = File::open("input.txt").expect("Failed to open input.txt");
-    let content = std::io::BufReader::new(f)
+    let content: Vec<String> = std::io::BufReader::new(f)
         .lines()
         .map(|line| line.unwrap())
-        .collect::<Vec<String>>();
+        .collect();
 
     one(&content);
     two(&content);
 }
 
-fn one(content: &Vec<String>) {
+fn one(content: &[String]) {
     let mut total = 0;
 
     for line in content {
@@ -31,14 +31,13 @@ fn one(content: &Vec<String>) {
         if last == 420 {
             last = first;
         }
-        let num = first.to_string() + &last.to_string();
-        total += num.parse::<u32>().unwrap();
+        total += first * 10 + last;
     }
 
     println!("{}", total);
 }
 
-fn two(content: &Vec<String>) {
+fn two(content: &[String]) {
     let mut total = 0;
     let map: HashMap<&str, u32> = [
         ("one", 1),

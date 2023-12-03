@@ -11,8 +11,9 @@ fn main() {
     one(&content);
 }
 
-fn one(content: &Vec<String>) {
+fn one(content: &[String]) {
     let mut total = 0;
+
     let non_symbols = ['.', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
     for (i, line) in content.iter().enumerate() {
@@ -91,3 +92,5 @@ fn one(content: &Vec<String>) {
     }
     println!("{}", total);
 }
+
+fn two(content: &[String]) {}
