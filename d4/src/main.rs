@@ -80,11 +80,8 @@ fn get_score(cards: &Vec<Card>) -> u32 {
 }
 
 fn get_matches(card: &Card) -> u32 {
-    let mut matches: u32 = 0;
-    for num in &card.win_nums {
-        if card.have_nums.contains(num) {
-            matches += 1;
-        }
-    }
-    matches
+    card.win_nums
+        .iter()
+        .filter(|num| card.have_nums.contains(num))
+        .count() as u32
 }
