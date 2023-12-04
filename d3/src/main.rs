@@ -1,5 +1,6 @@
 use std::fs::File;
 use std::io::BufRead;
+use std::usize;
 
 fn main() {
     let f = File::open("input.txt").unwrap();
@@ -9,6 +10,7 @@ fn main() {
         .collect();
 
     one(&content);
+    two(&content);
 }
 
 fn one(content: &[String]) {
@@ -93,4 +95,109 @@ fn one(content: &[String]) {
     println!("{}", total);
 }
 
-fn two(content: &[String]) {}
+fn two(content: &[String]) {
+    let mut total = 0;
+    let stars = parse_stars(&content);
+    let nums = parse_nums(&content);
+
+    for star in stars {
+        match get_nums_from_star(&star, &nums) {
+            Some(stars) => total += stars.0 * stars.1,
+            None => continue,
+        }
+    }
+    println!("{}", total);
+}
+
+fn parse_nums(str: &[String]) -> Vec<Number> {
+    let mut numbers: Vec<Number> = vec![];
+    let mut num_start: usize = 0;
+    let mut num_end: usize = 0;
+    let mut within = false;
+    let mut done = false;
+
+    for (l, line) in str.iter().enumerate() {
+        if within && !done {
+            num_end = line.len();
+            let value: u32 = str.iter().nth(l - 1).unwrap()[num_start..num_end]
+                .parse()
+                .unwrap();
+            numbers.push(Number {
+                value: (value),
+                l: (l - 1),
+                c: (num_start),
+                len: (num_end - num_start),
+            })
+        }
+        num_start = 0;
+        num_end = 0;
+        within = false;
+        done = false;
+
+        for (c, char) in line.chars().enumerate() {
+            if !within && char.is_digit(10) && !done {
+                num_start = c;
+                within = true;
+                done = false;
+            } else if within && !char.is_digit(10) && !done {
+                num_end = c;
+                within = false;
+                done = true;
+            }
+
+            if !within && done && !char.is_digit(10) {
+                let value: u32 = line[num_start..num_end].parse().unwrap();
+                done = false;
+
+                numbers.push(Number {
+                    value: (value),
+                    l: (l),
+                    c: (num_start),
+                    len: (num_end - num_start),
+                })
+            }
+        }
+    }
+    numbers
+}
+
+fn parse_stars(str: &[String]) -> Vec<(usize, usize)> {
+    let mut stars: Vec<(usize, usize)> = vec![];
+
+    for (l, line) in str.iter().enumerate() {
+        for (c, char) in line.chars().enumerate() {
+            if char == '*' {
+                stars.push((l, c));
+            }
+        }
+    }
+    stars
+}
+
+fn get_nums_from_star((l, c): &(usize, usize), nums: &Vec<Number>) -> Option<(u32, u32)> {
+    let mut found: Vec<u32> = vec![];
+    for num in nums {
+        if num.l != l - 1 && num.l != l + 1 && num.l != *l {
+            continue;
+        }
+
+        if (num.c.saturating_sub(1)..=num.c + num.len).contains(c) {
+            found.push(num.value);
+        }
+    }
+
+    if found.len() == 2 {
+        return Some((found[0], found[1]));
+    }
+    if found.len() > 2 {
+        println!("wtf");
+    }
+    None
+}
+
+struct Number {
+    value: u32,
+    l: usize,
+    c: usize,
+    len: usize,
+}
